@@ -13,7 +13,17 @@ from typing import List
 from bson.objectid import ObjectId
 
 app = FastAPI()
-
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 from pymongo import MongoClient
 #I left the username and password plain on purpose :)
