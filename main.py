@@ -79,16 +79,12 @@ def login(request:OAuth2PasswordRequestForm = Depends()):
 
 @app.post('/addPokemon')
 async def addPokemon(token: str, pokemonName: str):
-    print("Pokename: ", pokemonName)
+    
     verify_token(token,credentials_exception)
     payload = getUserName(token)
     currentUser  = payload['user'];
-    print("currentUser :",currentUser)
-    print("##########################")
     addPoke =  db["users"].find_one({"username":currentUser})
-    print(addPoke)
     if addPoke:
-        print("User found")
         pokeArr = addPoke['pokemons']
         if pokemonName in pokeArr:
             return{"status_code":status.HTTP_406_NOT_ACCEPTABLE,"response":"Pokemon already exists"}
