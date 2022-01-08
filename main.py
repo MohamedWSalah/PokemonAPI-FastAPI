@@ -26,6 +26,7 @@ app.add_middleware(
 )
 
 from pymongo import MongoClient
+#I left the username and password plain on purpose :)
 mongodb_uri = 'mongodb+srv://moon:moon@cluster0.gejee.mongodb.net/Pokemon?retryWrites=true&w=majority'
 port = 8000
 client = MongoClient(mongodb_uri, port)
@@ -39,11 +40,8 @@ class User(BaseModel):
 class Login(BaseModel):
 	username: str
 	password: str
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-class TokenData(BaseModel):
-    username: Optional[str] = None
+
+
 
 credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -57,13 +55,17 @@ def read_root(current_user:User = Depends(get_current_user)):
 
 @app.post('/register')
 def create_user(request:User):
-	hashed_pass = Hash.bcrypt(request.password)
-	user_object = dict(request)
-	user_object["password"] = hashed_pass
-    
-	user_id = db["users"].insert_one(user_object)
-	# print(user)
-	return {"res":"account created successfully"}
+    user = db["users"].find_one({"username":request.username})
+    print(user)
+    if user:
+        return{"status_code":status.HTTP_406_NOT_ACCEPTABLE,"response":"Username already exists"}
+    else:
+        hashed_pass = Hash.bcrypt(request.password)
+        user_object = dict(request)
+        user_object["password"] = hashed_pass
+        user_id = db["users"].insert_one(user_object)
+        # print(user)
+        return {"status_code":status.HTTP_200_OK,"response":"account created successfully"}
 
 @app.post('/login')
 def login(request:OAuth2PasswordRequestForm = Depends()):
