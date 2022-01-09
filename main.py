@@ -36,7 +36,7 @@ db = client["User"]
 class User(BaseModel):
     username: str
     password: str
-    pokemons: Optional[List[str]] = None
+    pokemons: Optional[List[str]]
 class Login(BaseModel):
 	username: str
 	password: str
@@ -98,4 +98,13 @@ async def addPokemon(token: str, pokemonName: str):
         return {"status_code":status.HTTP_200_OK,"response":"Pokemon added successfully"}
     
     return {"data":"done"}
-    
+
+@app.get('/userpokemons')
+async def userPokemons(token:str):
+    verify_token(token,credentials_exception)
+    payload = getUserName(token)
+    currentUser  = payload['user'];
+    user =  db["users"].find_one({"username":currentUser})
+    if user:
+        pokeArr = user['pokemons']
+        return {"response":pokeArr}
