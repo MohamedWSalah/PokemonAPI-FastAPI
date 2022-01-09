@@ -63,6 +63,7 @@ def create_user(request:User):
         hashed_pass = Hash.bcrypt(request.password)
         user_object = dict(request)
         user_object["password"] = hashed_pass
+        user_object["pokemons"] = []
         user_id = db["users"].insert_one(user_object)
         # print(user)
         return {"status_code":status.HTTP_200_OK,"response":"account created successfully"}
