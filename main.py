@@ -69,13 +69,16 @@ def create_user(request:User):
 
 @app.post('/login')
 def login(request:OAuth2PasswordRequestForm = Depends()):
-	user = db["users"].find_one({"username":request.username})
-	if not user:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'No user found with this {request.username} username')
-	if not Hash.verify(user["password"],request.password):
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = 'Wrong Username or password')
-	access_token = create_access_token(data={"user": user["username"] })
-	return {"access_token": access_token, "token_type": "bearer"}
+    if not request.username or not request.password:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'Usernamd and password required')
+    else :
+        user = db["users"].find_one({"username":request.username})
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = f'No user found with this {request.username} username')
+        if not Hash.verify(user["password"],request.password):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail = 'Wrong Username or password')
+        access_token = create_access_token(data={"user": user["username"] })
+        return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post('/addPokemon')
 async def addPokemon(token: str, pokemonName: str):
