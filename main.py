@@ -13,10 +13,8 @@ from typing import List
 from bson.objectid import ObjectId
 
 app = FastAPI()
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8080",
-]
+origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
